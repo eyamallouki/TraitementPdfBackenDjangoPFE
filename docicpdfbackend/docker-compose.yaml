@@ -1,0 +1,29 @@
+version: '3.11'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=dbdocic
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=eyamk
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  pfeapp:
+    build: .
+    command: gunicorn docicpdfbackend.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=dbdocic
+      - DB_USER=postgres
+      - DB_PASSWORD=eyamk
+
+volumes:
+  postgres_data:
