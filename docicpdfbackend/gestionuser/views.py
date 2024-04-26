@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+
 User = get_user_model()
 from django.contrib.sites.shortcuts import get_current_site
 import jwt
@@ -19,6 +21,7 @@ from .serializers import (
     UserLoginSerializer,
     UserChangePasswordSerializer
 )
+
 from .utils import Util
 from .renderers import UserRenderer
 from rest_framework.views import APIView
@@ -91,18 +94,18 @@ class PasswordResetRequestView(generics.GenericAPIView):
                 token = PasswordResetTokenGenerator().make_token(user)
 
                 confirmation_url = f"http://localhost:4200/confirmepwd/{uidb64}/{token}"
-
                 reset_password_url = request.build_absolute_uri(confirmation_url)
 
                 email_body = f"Bonjour {user.username},\n Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant : {reset_password_url}\n\nSi vous rencontrez des problèmes avec le lien, vous pouvez également accéder à cette page pour réinitialiser votre mot de passe : {confirmation_url}"
-                Util.send_email({'email_subject': 'Réinitialisation de mot de passe', 'email_body': email_body, 'to_email': email})
-                return Response({'message': 'Un email de réinitialisation de mot de passe a été envoyé.'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'message': 'Aucun utilisateur avec cet email trouvé.'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                send_mail('Réinitialisation de mot de passe', email_body, settings.EMAIL_HOST_USER, [email])
 
-class ConfirmResetPasswordView(APIView):
+                return JsonResponse({'message': 'Un email de réinitialisation de mot de passe a été envoyé.'}, status=status.HTTP_200_OK)
+            else:
+                return JsonResponse({'message': 'Aucun utilisateur avec cet email trouvé.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ConfirmResetPasswordView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserChangePasswordSerializer
 
@@ -114,15 +117,16 @@ class ConfirmResetPasswordView(APIView):
                 user = User.objects.get(pk=uid)
             except (TypeError, ValueError, OverflowError, User.DoesNotExist):
                 user = None
+
             if user is not None and PasswordResetTokenGenerator().check_token(user, token):
                 new_password = serializer.validated_data['new_password']
                 user.set_password(new_password)
                 user.save()
-                return Response({'msg': 'Password Changed Successfully'}, status=status.HTTP_200_OK)
+                return JsonResponse({'msg': 'Password Changed Successfully'}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserChangePasswordView(APIView):
     renderer_classes = [UserRenderer]

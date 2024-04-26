@@ -47,8 +47,6 @@ class UserLoginSerializer(serializers.Serializer):
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
-
-
 class UserChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
     new_password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
@@ -58,8 +56,7 @@ class UserChangePasswordSerializer(serializers.Serializer):
         new_password2 = attrs.get('new_password2')
 
         if new_password != new_password2:
-            raise serializers.ValidationError("New Password and Confirm New Password doesn't match")
-
+            raise serializers.ValidationError("New Password and Confirm New Password don't match")
         return attrs
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
