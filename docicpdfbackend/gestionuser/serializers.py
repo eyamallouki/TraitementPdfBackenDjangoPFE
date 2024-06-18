@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Role
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
@@ -62,3 +62,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'name']
+
+class AssignUserSerializer(serializers.ModelSerializer):
+    assigned_to = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=Role.ADMINISTRATEUR))
+
+    class Meta:
+        model = User
+        fields = ['assigned_to']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'role', 'is_verified', 'is_active', 'created_at', 'updated_at']

@@ -1,5 +1,4 @@
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission)
-
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -25,7 +24,7 @@ class UserManager(BaseUserManager):
             raise TypeError('Password should not be none')
         if email is None:
             raise TypeError('Users should have a username')
-        user = self.create_user(username, email, Role.ADMINISTRATEUR, password)  # Utilisez le rôle administrateur pour le superutilisateur
+        user = self.create_user(username, email, Role.ADMINISTRATEUR, password)
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -40,9 +39,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    assigned_to = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='assigned_users')
 
-    groups = models.ManyToManyField( Group, related_name='gestionuser_users' )
-    user_permissions = models.ManyToManyField( Permission, related_name='gestionuser_users' )
+    groups = models.ManyToManyField(Group, related_name='gestionuser_users')
+    user_permissions = models.ManyToManyField(Permission, related_name='gestionuser_users')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

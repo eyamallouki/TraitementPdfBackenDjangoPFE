@@ -3,7 +3,8 @@ from django.urls.conf import include
 from django.views.generic import RedirectView, TemplateView
 
 from .views import RegisterView, VerifyEmail, UserLoginAPIView, UserChangePasswordView, \
-    UserProfileView, UserLogoutView, ConfirmResetPasswordView, PasswordResetRequestView
+    UserProfileView, UserLogoutView, ConfirmResetPasswordView, PasswordResetRequestView, AssignUserView, \
+    AssignedPatientsView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -15,6 +16,9 @@ urlpatterns = [
     path('change-password/', UserChangePasswordView.as_view(), name='change-password'),
     path('profile/', UserProfileView.as_view(), name='profile'),
     path( 'logout/', UserLogoutView.as_view(), name='logout' ),
+    path( 'assign-user/<int:pk>/', AssignUserView.as_view(), name='assign-user' ),
+    path('assigned-patients/', AssignedPatientsView.as_view(), name='assigned-patients'),
+
 
 
 ]

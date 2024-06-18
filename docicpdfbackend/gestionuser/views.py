@@ -11,16 +11,18 @@ from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.urls import reverse
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import User
+from .models import User, Role
 from .serializers import (
     RegistrationSerializer,
     PasswordResetRequestSerializer,
     UserProfileSerializer,
     UserLoginSerializer,
-    UserChangePasswordSerializer
+    UserChangePasswordSerializer,
+    AssignUserSerializer, UserSerializer
 )
+
 
 from .utils import Util
 from .renderers import UserRenderer
@@ -162,3 +164,39 @@ class UserLogoutView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'Logged out successfully.'}, status=status.HTTP_200_OK)
+
+
+
+class AssignUserView( generics.UpdateAPIView ):
+        queryset = User.objects.all()
+        permission_classes = [permissions.IsAuthenticated]
+        serializer_class = AssignUserSerializer
+
+        def update(self, request, *args, **kwargs):
+            instance = self.get_object()
+            if instance.role == Role.ADMINISTRATEUR:
+                return Response( {'error': 'Cannot assign an administrator to another user'},
+                                 status=status.HTTP_400_BAD_REQUEST )
+
+            serializer = self.get_serializer( instance, data=request.data, partial=True )
+            serializer.is_valid( raise_exception=True )
+            self.perform_update( serializer )
+
+            return Response( serializer.data, status=status.HTTP_200_OK )
+
+class AssignedPatientsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == Role.ADMINISTRATEUR:
+            return User.objects.filter(assigned_to=user, role=Role.PATIENT)
+        return User.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if queryset.exists():
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response({'message': 'No patients assigned to this administrator.'})
