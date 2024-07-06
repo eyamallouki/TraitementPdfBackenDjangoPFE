@@ -2,7 +2,12 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+from falcon.bench.dj.dj.settings import BASE_DIR
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SECRET_KEY = 'django-insecure-)1f5tr0vi&cf-onqxp_@omql=)2p)u)j8gamr5$e+dtk4p*ksi'
 
@@ -37,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'gestionpdf.middleware.XFrameOptionsMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -119,6 +125,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+APPEND_SLASH = True
+
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -139,6 +148,5 @@ EMAIL_HOST_USER = 'malloukieya31@gmail.com'
 EMAIL_HOST_PASSWORD = 'bpro kwlc vdgn zszf'
 EMAIL_USE_TLS = True
 
-# Configuration pour les fichiers media
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+

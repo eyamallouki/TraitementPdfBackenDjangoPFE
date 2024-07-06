@@ -20,7 +20,7 @@ class AfficheFileView(APIView):
                 file_ext = pdf.file.name.lower()
                 if file_ext.endswith('.pdf'):
                     pdf_files.append(pdf)
-                elif file_ext.endswith('.txt'):
+                elif file_ext.endswith('.docx'):
                     txt_files.append(pdf)
                 elif file_ext.endswith('.jpg'):
                     jpg_files.append(pdf)
