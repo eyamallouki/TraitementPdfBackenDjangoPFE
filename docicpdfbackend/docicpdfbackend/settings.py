@@ -98,6 +98,8 @@ DATABASES = {
         'PORT': '16380',
     }
 }
+X_FRAME_OPTIONS = 'ALLOW-FROM http://127.0.0.1:8000/'
+
 
 REST_FRAMEWORK = {
     'NON_FIELDS_ERRORS_KEY': 'error',

@@ -1,10 +1,13 @@
+from django.template.context_processors import static
 from django.urls import path
 from django.urls.conf import include
 from django.views.generic import RedirectView, TemplateView
 
 from .views import RegisterView, VerifyEmail, UserLoginAPIView, UserChangePasswordView, \
     UserProfileView, UserLogoutView, ConfirmResetPasswordView, PasswordResetRequestView, AssignUserView, \
-    AssignedPatientsView
+   AllPatientsView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -16,9 +19,9 @@ urlpatterns = [
     path('change-password/', UserChangePasswordView.as_view(), name='change-password'),
     path('profile/', UserProfileView.as_view(), name='profile'),
     path( 'logout/', UserLogoutView.as_view(), name='logout' ),
-    path( 'assign-user/<int:pk>/', AssignUserView.as_view(), name='assign-user' ),
-    path('assigned-patients/', AssignedPatientsView.as_view(), name='assigned-patients'),
-
-
+    path( 'assign-patient/<int:pk>/', AssignUserView.as_view(), name='assign-patient' ),
+    path( 'all-patients/', AllPatientsView.as_view(), name='all-patients' )
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

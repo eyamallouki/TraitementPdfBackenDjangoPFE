@@ -166,37 +166,32 @@ class UserLogoutView(APIView):
         return Response({'message': 'Logged out successfully.'}, status=status.HTTP_200_OK)
 
 
-
 class AssignUserView( generics.UpdateAPIView ):
-        queryset = User.objects.all()
-        permission_classes = [permissions.IsAuthenticated]
-        serializer_class = AssignUserSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = AssignUserSerializer
 
-        def update(self, request, *args, **kwargs):
-            instance = self.get_object()
-            if instance.role == Role.ADMINISTRATEUR:
-                return Response( {'error': 'Cannot assign an administrator to another user'},
-                                 status=status.HTTP_400_BAD_REQUEST )
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.role == Role.ADMINISTRATEUR:
+            return Response( {'error': 'Cannot assign an administrator to another user'},
+                             status=status.HTTP_400_BAD_REQUEST )
 
-            serializer = self.get_serializer( instance, data=request.data, partial=True )
-            serializer.is_valid( raise_exception=True )
-            self.perform_update( serializer )
+        serializer = self.get_serializer( instance, data=request.data, partial=True )
+        serializer.is_valid( raise_exception=True )
+        self.perform_update( serializer )
 
-            return Response( serializer.data, status=status.HTTP_200_OK )
+        return Response( serializer.data, status=status.HTTP_200_OK )
 
-class AssignedPatientsView(generics.ListAPIView):
+
+class AllPatientsView( generics.ListAPIView ):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        if user.role == Role.ADMINISTRATEUR:
-            return User.objects.filter(assigned_to=user, role=Role.PATIENT)
-        return User.objects.none()
+        return User.objects.filter( role=Role.PATIENT )
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        if queryset.exists():
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-        return Response({'message': 'No patients assigned to this administrator.'})
+        serializer = self.get_serializer( queryset, many=True )
+        return Response( serializer.data )

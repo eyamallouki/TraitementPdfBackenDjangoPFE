@@ -15,9 +15,14 @@ class PDF(models.Model):
     patient_associé = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdfs')
     date_creation = models.DateTimeField( default=timezone.now )
     date_modification = models.DateTimeField( default=timezone.now )
+    images = models.ManyToManyField( 'Image' )
 
     def __str__(self):
         return self.titre
+
+class Image(models.Model):
+    file = models.ImageField(upload_to='images/')
+
 
 class Page(models.Model):
     pdf = models.ForeignKey(PDF, on_delete=models.CASCADE, related_name='pdf_pages')  # Renommez related_name
