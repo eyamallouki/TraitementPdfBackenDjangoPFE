@@ -11,11 +11,11 @@ class PDF(models.Model):
         ('non_traité', 'Non traité'),
     ]
     etat = models.CharField(max_length=20, choices=ETAT_CHOICES, default='non_traité')
-    file = models.FileField( upload_to='pdfs/', null=True, blank=True )
+    file = models.FileField(upload_to='pdfs/', max_length=255, null=True, blank=True)
     patient_associé = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdfs')
-    date_creation = models.DateTimeField( default=timezone.now )
-    date_modification = models.DateTimeField( default=timezone.now )
-    images = models.ManyToManyField( 'Image' )
+    date_creation = models.DateTimeField(default=timezone.now)
+    date_modification = models.DateTimeField(default=timezone.now)
+    images = models.ManyToManyField('Image')
 
     def __str__(self):
         return self.titre
@@ -23,9 +23,8 @@ class PDF(models.Model):
 class Image(models.Model):
     file = models.ImageField(upload_to='images/')
 
-
 class Page(models.Model):
-    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE, related_name='pdf_pages')  # Renommez related_name
+    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE, related_name='pdf_pages')
     numéro = models.IntegerField()
     orientation = models.CharField(max_length=50)
 
