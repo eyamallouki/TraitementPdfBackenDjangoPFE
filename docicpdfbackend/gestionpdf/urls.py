@@ -1,6 +1,7 @@
 from django.urls import path
 from .AfficheFileView import AfficheFileView
 from .ClientFilesView import get_patient_files
+from .UpdatePageOrderView import UpdatePageOrderView, GetPdfPagesView
 from .delete_pdf import delete_pdf
 from .uploadfileview import PDFUploadView, get_pdf_images
 from django.conf import settings
@@ -24,6 +25,10 @@ urlpatterns = [
     path('<int:pdf_id>/move-page/', MovePageView.as_view(), name='move-page'),
     path('<int:pdf_id>/import-document/', ImportDocumentView.as_view(), name='import-document'),
     path('<int:pdf_id>/extract-pages/', ExtractPagesView.as_view(), name='extract-pages'),
+    path('pdf/<int:pdf_id>/update-page-order/', UpdatePageOrderView.as_view(), name='update_page_order'),
+    path( 'pdf/<int:pdf_id>/pages/', GetPdfPagesView.as_view(), name='pdf_pages' ),
+
+
 ]
 
 if settings.DEBUG:

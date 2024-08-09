@@ -15,6 +15,12 @@ class RotatePagesView(APIView):
         pages_to_rotate = request.data.get('pages_to_rotate', [])
         rotation_angle = request.data.get('rotation_angle')
 
+        # Convertir la rotation en entier
+        try:
+            rotation_angle = int(rotation_angle)
+        except ValueError:
+            return Response({'error': 'Invalid rotation angle provided'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not pages_to_rotate or rotation_angle is None:
             return Response({'error': 'pages_to_rotate et rotation_angle sont requis'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,3 +50,5 @@ class RotatePagesView(APIView):
             return Response({'error': 'PDF non trouvé'}, status=status.HTTP_404_NOT_FOUND)
         except IndexError:
             return Response({'error': 'Index de page hors limites'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
