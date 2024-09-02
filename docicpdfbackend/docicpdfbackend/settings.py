@@ -99,6 +99,9 @@ DATABASES = {
     }
 }
 X_FRAME_OPTIONS = 'ALLOW-FROM http://127.0.0.1:8000/'
+# Dans votre fichier settings.py
+X_FRAME_OPTIONS = 'ALLOW-FROM http://localhost:4200'
+
 
 
 REST_FRAMEWORK = {
