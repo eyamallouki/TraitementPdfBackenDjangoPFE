@@ -14,9 +14,9 @@ class PDF(models.Model):
     file = models.FileField(upload_to='pdfs/', max_length=255, null=True, blank=True)
     patient_associé = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdfs')
     date_creation = models.DateTimeField(default=timezone.now)
-    date_modification = models.DateTimeField(auto_now=True)  # Use auto_now for automatic update on modification
-    images = models.ManyToManyField('Image', related_name='pdfs')  # Ensure proper related_name usage
-    filtered_text = models.TextField(blank=True, null=True)  # Field to store OCR filtered text
+    date_modification = models.DateTimeField(auto_now=True)
+    images = models.ManyToManyField('Image', related_name='pdfs', blank=True)  # Ensure this field is optional
+    filtered_text = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.titre
@@ -37,11 +37,12 @@ class Page(models.Model):
     def __str__(self):
         return f"Page {self.numéro} de {self.pdf}"
 
-
 class ExtractedImage(models.Model):
     pdf_document = models.ForeignKey(PDF, on_delete=models.CASCADE, related_name='extracted_images')
-    image = models.ImageField(upload_to='extracted_images/')
+    image = models.ImageField( upload_to='extracted_images/', max_length=255 )
     page_number = models.IntegerField()
-    crop_coordinates = models.JSONField()  # Store the crop coordinates as JSON
+    crop_coordinates = models.JSONField(null=True, blank=True)
     date_extraction = models.DateTimeField(auto_now_add=True)
-    crop_coordinates = models.JSONField( null=True, blank=True )
+
+    def __str__(self):
+        return f"Extracted Image from {self.pdf_document.titre} - Page {self.page_number}"

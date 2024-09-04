@@ -30,7 +30,7 @@ urlpatterns = [
     path('pdf/<int:pdf_id>/update-page-order/', UpdatePageOrderView.as_view(), name='update_page_order'),
     path('pdf/<int:pdf_id>/pages/', GetPdfPagesView.as_view(), name='pdf_pages'),
     path( 'ocr/<int:pdf_id>/', OCRProcessView.as_view(), name='ocr_process' ),
-    path( 'crop/<int:image_id>/', CropImageView.as_view(), name='crop_image' ),
+    path( 'pdf/crop/<int:image_id>/', CropImageView.as_view(), name='crop_image' )
 ]
 
 if settings.DEBUG:
