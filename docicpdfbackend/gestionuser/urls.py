@@ -5,7 +5,7 @@ from django.views.generic import RedirectView, TemplateView
 
 from .views import RegisterView, VerifyEmail, UserLoginAPIView, UserChangePasswordView, \
     UserProfileView, UserLogoutView, ConfirmResetPasswordView, PasswordResetRequestView, AssignUserView, \
-   AllPatientsView
+    AllPatientsView, UserUpdateView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -20,7 +20,8 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='profile'),
     path( 'logout/', UserLogoutView.as_view(), name='logout' ),
     path( 'assign-patient/<int:pk>/', AssignUserView.as_view(), name='assign-patient' ),
-    path( 'all-patients/', AllPatientsView.as_view(), name='all-patients' )
+    path( 'all-patients/', AllPatientsView.as_view(), name='all-patients' ),
+    path( 'user-update/', UserUpdateView.as_view(), name='user-update' ),
 
 ]
 if settings.DEBUG:

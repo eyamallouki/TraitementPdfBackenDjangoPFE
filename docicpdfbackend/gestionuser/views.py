@@ -20,7 +20,7 @@ from .serializers import (
     UserProfileSerializer,
     UserLoginSerializer,
     UserChangePasswordSerializer,
-    AssignUserSerializer, UserSerializer
+    AssignUserSerializer, UserUpdateSerializer, UserSerializer
 )
 
 
@@ -195,3 +195,21 @@ class AllPatientsView( generics.ListAPIView ):
         queryset = self.get_queryset()
         serializer = self.get_serializer( queryset, many=True )
         return Response( serializer.data )
+
+
+
+class UserUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Récupérer l'utilisateur actuellement connecté pour permettre la modification de ses informations
+        return self.request.user
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data, status=200)
