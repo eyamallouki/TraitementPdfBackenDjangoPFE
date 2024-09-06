@@ -1,7 +1,7 @@
 from django.urls import path
 from .AfficheFileView import AfficheFileView
 from .ClientFilesView import get_patient_files
-from .OCRProcessView import OCRProcessView, CropImageView
+from .OCRProcessView import OCRProcessView, CropImageView, UploadImageView
 from .ResumerDocumentView import  DocumentProcessingView
 from .UpdatePageOrderView import UpdatePageOrderView, GetPdfPagesView
 from .delete_pdf import delete_pdf
@@ -30,7 +30,8 @@ urlpatterns = [
     path('pdf/<int:pdf_id>/update-page-order/', UpdatePageOrderView.as_view(), name='update_page_order'),
     path('pdf/<int:pdf_id>/pages/', GetPdfPagesView.as_view(), name='pdf_pages'),
     path( 'ocr/<int:pdf_id>/', OCRProcessView.as_view(), name='ocr_process' ),
-    path( 'pdf/crop/<int:image_id>/', CropImageView.as_view(), name='crop_image' )
+    path( 'pdf/crop/<int:image_id>/', CropImageView.as_view(), name='crop_image' ),
+    path('upload-image/', UploadImageView.as_view(), name='upload_image'),
 ]
 
 if settings.DEBUG:
