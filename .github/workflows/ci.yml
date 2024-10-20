@@ -25,27 +25,26 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
-          echo "POSTGRES_PASSWORD=iCvDaIoaZmSMGfHhZesEgnbWjunkffef" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=tZgwfUYeUrqmqrVNUMnMLdzYVfZvqBbO" >> $GITHUB_ENV
           echo "POSTGRES_DB=railway" >> $GITHUB_ENV
-          echo "POSTGRES_HOST=viaduct.proxy.rlwy.net" >> $GITHUB_ENV
-          echo "POSTGRES_PORT=54519" >> $GITHUB_ENV
+          echo "POSTGRES_HOST=monorail.proxy.rlwy.net" >> $GITHUB_ENV
+          echo "POSTGRES_PORT=52563" >> $GITHUB_ENV
 
-      - name: Install Python dependencies
-        run: |
-          cd docicpdfbackend  # Changer de répertoire pour accéder à requirements.txt
-          pip install -r requirements.txt
-
-      - name: Run Django Migrations
-        run: |
-          cd docicpdfbackend
-          python manage.py migrate
-
-      - name: Wait for PostgreSQL to be ready
+      - name: Check PostgreSQL connection
         run: |
           until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER}; do
             echo "Waiting for PostgreSQL to be ready..."
             sleep 5
           done
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r docicpdfbackend/requirements.txt
+
+      - name: Run Django Migrations
+        run: |
+          cd docicpdfbackend
+          python manage.py migrate
 
       - name: Run Tests
         run: |
