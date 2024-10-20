@@ -32,12 +32,14 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r docicpdfbackend/requirements.txt  # Chemin vers requirements.txt
 
       - name: Run Django Migrations
         run: |
+          cd docicpdfbackend
           python manage.py migrate
 
       - name: Run Tests
         run: |
+          cd docicpdfbackend
           python manage.py test
