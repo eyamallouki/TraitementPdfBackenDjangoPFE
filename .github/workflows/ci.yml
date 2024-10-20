@@ -12,21 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        ports:
-          - 54519:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -42,18 +27,27 @@ jobs:
           echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
           echo "POSTGRES_PASSWORD=iCvDaIoaZmSMGfHhZesEgnbWjunkffef" >> $GITHUB_ENV
           echo "POSTGRES_DB=railway" >> $GITHUB_ENV
-          echo "POSTGRES_HOST=localhost" >> $GITHUB_ENV  # Use localhost for Docker
-          echo "POSTGRES_PORT=5432" >> $GITHUB_ENV  # Default PostgreSQL port
+          echo "POSTGRES_HOST=viaduct.proxy.rlwy.net" >> $GITHUB_ENV
+          echo "POSTGRES_PORT=54519" >> $GITHUB_ENV
 
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r docicpdfbackend/requirements.txt
+          cd docicpdfbackend  # Changer de répertoire pour accéder à requirements.txt
+          pip install -r requirements.txt
 
       - name: Run Django Migrations
         run: |
+          cd docicpdfbackend
           python manage.py migrate
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER}; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 5
+          done
 
       - name: Run Tests
         run: |
+          cd docicpdfbackend
           python manage.py test
