@@ -16,7 +16,7 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: railway  # Nom de la base de données: "railway"
+          POSTGRES_DB: railway
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
         ports:
@@ -37,16 +37,17 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Build and Run Docker Compose
         run: |
-          docker-compose up -d --build
+          docker-compose -f ./docicpdfbackend/docker-compose.yaml up -d --build  # Chemin mis à jour vers le fichier docker-compose.yaml
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
-          POSTGRES_DB: railway  # Utilisation de la base de données "railway"
+          POSTGRES_DB: railway
+
+      - name: Wait for DB to be ready
+        run: |
+          docker-compose exec dbpostgres pg_isready -U postgres -d railway
 
       - name: Run Django Migrations
         run: |
