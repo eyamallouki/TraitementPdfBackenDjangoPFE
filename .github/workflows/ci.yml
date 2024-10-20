@@ -33,4 +33,30 @@ jobs:
 
       - name: Install Docker Compose
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Build and Run Docker Compose
+        run: |
+          docker-compose -f ./docicpdfbackend/docker-compose.yaml up -d --build
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
+          POSTGRES_DB: railway
+
+      - name: Wait for DB to be ready
+        run: |
+          docker-compose exec postgres pg_isready -U postgres -d railway
+
+      - name: Run Django Migrations
+        run: |
+          docker-compose exec docicpdfbackend python manage.py migrate
+
+      - name: Run Tests
+        run: |
+          docker-compose exec docicpdfbackend python manage.py test
+
+      - name: Shut down services
+        run: |
+          docker-compose down
