@@ -12,21 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: railway
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,26 +22,22 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Build and Run Docker Compose
+      - name: Set up environment variables
         run: |
-          docker-compose -f ./docicpdfbackend/docker-compose.yaml up -d --build
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
-          POSTGRES_DB: railway
+          echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=iCvDaIoaZmSMGfHhZesEgnbWjunkffef" >> $GITHUB_ENV
+          echo "POSTGRES_DB=railway" >> $GITHUB_ENV
+          echo "POSTGRES_HOST=viaduct.proxy.rlwy.net" >> $GITHUB_ENV
+          echo "POSTGRES_PORT=54519" >> $GITHUB_ENV
 
-      - name: Wait for DB to be ready
+      - name: Install Python dependencies
         run: |
-          docker-compose exec postgres pg_isready -U postgres -d railway
+          pip install -r requirements.txt
 
       - name: Run Django Migrations
         run: |
-          docker-compose exec docicpdfbackend python manage.py migrate
+          python manage.py migrate
 
       - name: Run Tests
         run: |
-          docker-compose exec docicpdfbackend python manage.py test
-
-      - name: Shut down services
-        run: |
-          docker-compose down
+          python manage.py test
