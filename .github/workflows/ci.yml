@@ -16,13 +16,13 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: docicdb
-          POSTGRES_USER: eya
-          POSTGRES_PASSWORD: eya
+          POSTGRES_DB: railway  # Nom de la base de données: "railway"
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U eya"
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -44,17 +44,17 @@ jobs:
         run: |
           docker-compose up -d --build
         env:
-          POSTGRES_USER: eya
-          POSTGRES_PASSWORD: eya
-          POSTGRES_DB: docicdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: iCvDaIoaZmSMGfHhZesEgnbWjunkffef
+          POSTGRES_DB: railway  # Utilisation de la base de données "railway"
 
       - name: Run Django Migrations
         run: |
-          docker-compose exec pfeapp python manage.py migrate
+          docker-compose exec docicpdfbackend python manage.py migrate
 
       - name: Run Tests
         run: |
-          docker-compose exec pfeapp python manage.py test
+          docker-compose exec docicpdfbackend python manage.py test
 
       - name: Shut down services
         run: |
